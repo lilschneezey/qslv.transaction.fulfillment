@@ -8,8 +8,8 @@
 		<version>2.2.2.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.bac</groupId>
-  <artifactId>qslv.cancel.fulfillment</artifactId>
+	<groupId>io.schneezey</groupId>
+	<artifactId>qslv.cancel.fulfillment</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Cancel Reservation Fulfillment</name>
 	<description>Kafka service to cancel reservations.</description>
@@ -58,7 +58,7 @@
 		<!-- Private -->
 
 		<dependency>
-			<groupId>com.bac</groupId>
+			<groupId>io.schneezey</groupId>
 			<artifactId>qslv.common.kafka</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<exclusions>
@@ -73,12 +73,12 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.bac</groupId>
+			<groupId>io.schneezey</groupId>
 			<artifactId>qslv.interface</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>com.bac</groupId>
+			<groupId>io.schneezey</groupId>
 			<artifactId>qslv.common</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
