@@ -23,6 +23,8 @@ public class ConfigProperties {
 	private int restBackoffDelayMax = 500; 
 	private String kafkaTransactionRequestQueue;
 	private String kafkaTransactionReplyQueue;
+	private String kafkaProducerPropertiesPath;
+	private String kafkaConsumerPropertiesPath;
 	private int kafkaTimeout;
 
 	public String getAitid() {
@@ -135,6 +137,22 @@ public class ConfigProperties {
 
 	public void setKafkaTransactionReplyQueue(String kafkaTransactionReplyQueue) {
 		this.kafkaTransactionReplyQueue = kafkaTransactionReplyQueue;
+	}
+
+	public String getKafkaProducerPropertiesPath() {
+		return kafkaProducerPropertiesPath;
+	}
+
+	public void setKafkaProducerPropertiesPath(String kafkaProducerPropertiesPath) {
+		this.kafkaProducerPropertiesPath = kafkaProducerPropertiesPath;
+	}
+
+	public String getKafkaConsumerPropertiesPath() {
+		return kafkaConsumerPropertiesPath;
+	}
+
+	public void setKafkaConsumerPropertiesPath(String kafkaConsumerPropertiesPath) {
+		this.kafkaConsumerPropertiesPath = kafkaConsumerPropertiesPath;
 	}
 
 }
