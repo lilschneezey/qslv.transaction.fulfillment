@@ -29,7 +29,7 @@ import qslv.common.kafka.TraceableMessage;
 import qslv.transaction.request.TransactionRequest;
 import qslv.transaction.request.TransferAndTransactRequest;
 import qslv.transaction.resource.TransactionResource;
-import qslv.transaction.response.TransferAndTransactReponse;
+import qslv.transaction.response.TransferAndTransactResponse;
 
 @ExtendWith(MockitoExtension.class)
 
@@ -63,15 +63,15 @@ class Unit_TransactionDao_transferAndTransact {
 		
 		//-Setup -----------
 		TraceableMessage<TransferAndTransactRequest> message = setup_traceable_message();
-		ResponseEntity<TimedResponse<TransferAndTransactReponse>> response = setup_responseEntity();
+		ResponseEntity<TimedResponse<TransferAndTransactResponse>> response = setup_responseEntity();
 		
 		//-Prepare----------------
 		doReturn(response).when(restTemplateProxy).exchange(anyString(), eq(HttpMethod.POST), 
 				ArgumentMatchers.<HttpEntity<TraceableMessage<TransferAndTransactRequest>>>any(), 
-				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>>>any());
+				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>>>any());
 		
 		//-Execute----------------
-		TransferAndTransactReponse callresult = transactionDao.transferAndTransact(message, message.getPayload());
+		TransferAndTransactResponse callresult = transactionDao.transferAndTransact(message, message.getPayload());
 
 		//-Verify----------------
 		assertSame(response.getBody().getPayload(), callresult);
@@ -98,13 +98,13 @@ class Unit_TransactionDao_transferAndTransact {
 		tandt.setTransactionRequest(request);
 		return tandt;
 	}
-	ResponseEntity<TimedResponse<TransferAndTransactReponse>> setup_responseEntity() {
-		return new ResponseEntity<TimedResponse<TransferAndTransactReponse>>(new TimedResponse<>(123456L, setup_response()), HttpStatus.CREATED);
+	ResponseEntity<TimedResponse<TransferAndTransactResponse>> setup_responseEntity() {
+		return new ResponseEntity<TimedResponse<TransferAndTransactResponse>>(new TimedResponse<>(123456L, setup_response()), HttpStatus.CREATED);
 	}
-	ResponseEntity<TimedResponse<TransferAndTransactReponse>> setup_failedResponseEntity() {
-		return new ResponseEntity<TimedResponse<TransferAndTransactReponse>>(new TimedResponse<>(234567L, setup_response()), HttpStatus.INTERNAL_SERVER_ERROR);
+	ResponseEntity<TimedResponse<TransferAndTransactResponse>> setup_failedResponseEntity() {
+		return new ResponseEntity<TimedResponse<TransferAndTransactResponse>>(new TimedResponse<>(234567L, setup_response()), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	TransferAndTransactReponse setup_response() {
+	TransferAndTransactResponse setup_response() {
 		ArrayList<TransactionResource> list = new ArrayList<>();
 		TransactionResource resource = new TransactionResource();
 		resource.setAccountNumber("27384729834");
@@ -112,7 +112,7 @@ class Unit_TransactionDao_transferAndTransact {
 		resource = new TransactionResource();
 		resource.setAccountNumber("9872398427394");
 		list.add(resource);
-		TransferAndTransactReponse resourceResponse = new TransferAndTransactReponse(TransferAndTransactReponse.SUCCESS, list);
+		TransferAndTransactResponse resourceResponse = new TransferAndTransactResponse(TransferAndTransactResponse.SUCCESS, list);
 		return resourceResponse;
 	}
 	
@@ -121,17 +121,17 @@ class Unit_TransactionDao_transferAndTransact {
 
 		//-Setup -----------
 		TraceableMessage<TransferAndTransactRequest> message = setup_traceable_message();
-		ResponseEntity<TimedResponse<TransferAndTransactReponse>> response = setup_responseEntity();
+		ResponseEntity<TimedResponse<TransferAndTransactResponse>> response = setup_responseEntity();
 		
 		//-Prepare----------------
 		doThrow(new ResourceAccessException("message", new SocketTimeoutException()) )
 		.doReturn(response)
 		.when(restTemplateProxy).exchange(anyString(), eq(HttpMethod.POST), 
 			ArgumentMatchers.<HttpEntity<TraceableMessage<TransferAndTransactRequest>>>any(), 
-			ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>>>any());
+			ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>>>any());
 		
 		//-Execute----------------
-		TransferAndTransactReponse callresult = transactionDao.transferAndTransact(message, message.getPayload());
+		TransferAndTransactResponse callresult = transactionDao.transferAndTransact(message, message.getPayload());
 
 		//-Verify----------------
 		assertSame(response.getBody().getPayload(), callresult);
@@ -142,7 +142,7 @@ class Unit_TransactionDao_transferAndTransact {
 
 		//-Setup -----------
 		TraceableMessage<TransferAndTransactRequest> message = setup_traceable_message();
-		ResponseEntity<TimedResponse<TransferAndTransactReponse>> response = setup_responseEntity();
+		ResponseEntity<TimedResponse<TransferAndTransactResponse>> response = setup_responseEntity();
 		
 		//-Prepare----------------
 		doThrow(new ResourceAccessException("message", new SocketTimeoutException()) )
@@ -150,10 +150,10 @@ class Unit_TransactionDao_transferAndTransact {
 		.doReturn(response)
 		.when(restTemplateProxy).exchange(anyString(), eq(HttpMethod.POST), 
 			ArgumentMatchers.<HttpEntity<TraceableMessage<TransferAndTransactRequest>>>any(), 
-			ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>>>any());
+			ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>>>any());
 		
 		//-Execute----------------
-		TransferAndTransactReponse callresult = transactionDao.transferAndTransact(message, message.getPayload());
+		TransferAndTransactResponse callresult = transactionDao.transferAndTransact(message, message.getPayload());
 
 		//-Verify----------------
 		assertSame(response.getBody().getPayload(), callresult);
@@ -170,7 +170,7 @@ class Unit_TransactionDao_transferAndTransact {
 		.doThrow(new ResourceAccessException("message", new SocketTimeoutException()) )
 		.when(restTemplateProxy).exchange(anyString(), eq(HttpMethod.POST), 
 			ArgumentMatchers.<HttpEntity<TraceableMessage<TransferAndTransactRequest>>>any(), 
-			ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>>>any());
+			ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>>>any());
 		
 		//-Execute----------------
 		assertThrows(TransientDataAccessResourceException.class, () -> {
@@ -184,12 +184,12 @@ class Unit_TransactionDao_transferAndTransact {
 		
 		//-Setup -----------
 		TraceableMessage<TransferAndTransactRequest> message = setup_traceable_message();
-		ResponseEntity<TimedResponse<TransferAndTransactReponse>> response = setup_failedResponseEntity();
+		ResponseEntity<TimedResponse<TransferAndTransactResponse>> response = setup_failedResponseEntity();
 		
 		//-Prepare----------------
 		doReturn(response).when(restTemplateProxy).exchange(anyString(), eq(HttpMethod.POST), 
 				ArgumentMatchers.<HttpEntity<TraceableMessage<TransferAndTransactRequest>>>any(), 
-				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>>>any());
+				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>>>any());
 
 		//-Execute----------------
 		assertThrows(NonTransientDataAccessResourceException.class, () -> {

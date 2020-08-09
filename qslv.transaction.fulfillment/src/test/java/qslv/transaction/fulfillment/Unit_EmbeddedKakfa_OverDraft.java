@@ -49,7 +49,7 @@ import qslv.transaction.resource.TransactionResource;
 import qslv.transaction.response.CommitReservationResponse;
 import qslv.transaction.response.ReservationResponse;
 import qslv.transaction.response.TransactionResponse;
-import qslv.transaction.response.TransferAndTransactReponse;
+import qslv.transaction.response.TransferAndTransactResponse;
 import qslv.util.Random;
 
 @SpringBootTest
@@ -90,7 +90,7 @@ public class Unit_EmbeddedKakfa_OverDraft {
 		ResponseEntity<TimedResponse<TransactionResponse>> response = setup_responseEntity();
 		List<OverdraftInstruction> instructions = setup_instructions();
 		ResponseEntity<TimedResponse<ReservationResponse>> reservation = setup_reservation();
-		ResponseEntity<TimedResponse<TransferAndTransactReponse>> transfer = setup_transfer();
+		ResponseEntity<TimedResponse<TransferAndTransactResponse>> transfer = setup_transfer();
 		ResponseEntity<TimedResponse<CommitReservationResponse>> commit = setup_commit();
 		
 		// -Prepare----------------------------
@@ -103,7 +103,7 @@ public class Unit_EmbeddedKakfa_OverDraft {
 				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<ReservationResponse>>>any());
 		doReturn(transfer).when(restTemplateProxy).exchange(eq(configProperties.getTransferAndTransactUrl()), eq(HttpMethod.POST), 
 				ArgumentMatchers.<HttpEntity<TraceableMessage<TransferAndTransactRequest>>>any(), 
-				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>>>any());
+				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>>>any());
 		doReturn(commit).when(restTemplateProxy).exchange(eq(configProperties.getCommitReservationUrl()), eq(HttpMethod.POST), 
 				ArgumentMatchers.<HttpEntity<TraceableMessage<CommitReservationRequest>>>any(), 
 				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<CommitReservationResponse>>>any());
@@ -264,7 +264,7 @@ public class Unit_EmbeddedKakfa_OverDraft {
 				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<ReservationResponse>>>any());
 		doThrow(new RuntimeException()).when(restTemplateProxy).exchange(eq(configProperties.getTransferAndTransactUrl()), eq(HttpMethod.POST), 
 				ArgumentMatchers.<HttpEntity<TraceableMessage<TransferAndTransactRequest>>>any(), 
-				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>>>any());
+				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>>>any());
 		TraceableMessage<TransactionRequest> message = setup_traceable();
 				
 		// -Execute----------------
@@ -297,7 +297,7 @@ public class Unit_EmbeddedKakfa_OverDraft {
 		ResponseEntity<TimedResponse<TransactionResponse>> response = setup_responseEntity();
 		List<OverdraftInstruction> instructions = setup_instructions();
 		ResponseEntity<TimedResponse<ReservationResponse>> reservation = setup_reservation();
-		ResponseEntity<TimedResponse<TransferAndTransactReponse>> transfer = setup_transfer();
+		ResponseEntity<TimedResponse<TransferAndTransactResponse>> transfer = setup_transfer();
 
 		// -Prepare----------------------------
 		doReturn(response).when(restTemplateProxy).exchange(eq(configProperties.getPostTransactionUrl()), eq(HttpMethod.POST), 
@@ -309,7 +309,7 @@ public class Unit_EmbeddedKakfa_OverDraft {
 				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<ReservationResponse>>>any());
 		doReturn(transfer).when(restTemplateProxy).exchange(eq(configProperties.getTransferAndTransactUrl()), eq(HttpMethod.POST), 
 				ArgumentMatchers.<HttpEntity<TraceableMessage<TransferAndTransactRequest>>>any(), 
-				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>>>any());
+				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>>>any());
 		doThrow(new RuntimeException()).when(restTemplateProxy).exchange(eq(configProperties.getCommitReservationUrl()), eq(HttpMethod.POST), 
 				ArgumentMatchers.<HttpEntity<TraceableMessage<CommitReservationRequest>>>any(), 
 				ArgumentMatchers.<ParameterizedTypeReference<TimedResponse<CommitReservationResponse>>>any());
@@ -422,16 +422,16 @@ public class Unit_EmbeddedKakfa_OverDraft {
 		return entity;
 	}
 
-	private ResponseEntity<TimedResponse<TransferAndTransactReponse>> setup_transfer() {
-		TransferAndTransactReponse transfer = new TransferAndTransactReponse();
-		transfer.setStatus(TransferAndTransactReponse.SUCCESS);
+	private ResponseEntity<TimedResponse<TransferAndTransactResponse>> setup_transfer() {
+		TransferAndTransactResponse transfer = new TransferAndTransactResponse();
+		transfer.setStatus(TransferAndTransactResponse.SUCCESS);
 		ArrayList<TransactionResource> list = new ArrayList<>();
 		list.add(randomTransaction());
 		list.add(randomTransaction());
 		transfer.setTransactions(list);
-		TimedResponse<TransferAndTransactReponse> response = new TimedResponse<TransferAndTransactReponse>(transfer);
+		TimedResponse<TransferAndTransactResponse> response = new TimedResponse<TransferAndTransactResponse>(transfer);
 		response.setServiceTimeElapsed(72384L);
-		ResponseEntity<TimedResponse<TransferAndTransactReponse>> entity = new ResponseEntity<TimedResponse<TransferAndTransactReponse>>(response, HttpStatus.CREATED);
+		ResponseEntity<TimedResponse<TransferAndTransactResponse>> entity = new ResponseEntity<TimedResponse<TransferAndTransactResponse>>(response, HttpStatus.CREATED);
 		return entity;
 	}
 	private TransactionResource randomTransaction() {

@@ -25,9 +25,9 @@ public class FulfillmentController {
 	@Autowired
 	FulfillmentService fulfillmentService;
 	@Autowired
-	private KafkaDao kafkaDao;
+	private KafkaProducerDao kafkaDao;
 
-	public void setKafkaDao(KafkaDao kafkaDao) {
+	public void setKafkaDao(KafkaProducerDao kafkaDao) {
 		this.kafkaDao = kafkaDao;
 	}
 	public void setConfig(ConfigProperties config) {
@@ -47,9 +47,9 @@ public class FulfillmentController {
 			validateMessage(message);
 			validateTransactionRequest(message.getPayload());	
 
-			TransactionResponse cancelResponse = fulfillmentService.processTransaction(message, message.getPayload());
+			TransactionResponse transactionResponse = fulfillmentService.processTransaction(message, message.getPayload());
 
-			traceableResponse.getPayload().setResponse( cancelResponse );
+			traceableResponse.getPayload().setResponse( transactionResponse );
 			traceableResponse.setMessageCompletionTime(LocalDateTime.now());
 
 			kafkaDao.produceResponse(traceableResponse);
@@ -65,6 +65,11 @@ public class FulfillmentController {
 
 			traceableResponse.getPayload().setMessage(ex.getLocalizedMessage());
 			traceableResponse.getPayload().setStatus(ResponseMessage.INTERNAL_ERROR);
+			if ( ex instanceof MalformedMessageException ) {
+				traceableResponse.getPayload().setStatus(ResponseMessage.MALFORMED_MESSAGE);
+			} else {
+				traceableResponse.getPayload().setStatus(ResponseMessage.INTERNAL_ERROR);
+			}
 			
 			try {
 				kafkaDao.produceResponse(traceableResponse);
@@ -93,6 +98,9 @@ public class FulfillmentController {
 		}
 		if (request.getTransactionMetaDataJson() == null || request.getTransactionMetaDataJson().isEmpty()) {
 			throw new MalformedMessageException("Malformed message payload. Missing Meta Data.");
+		}
+		if (request.getTransactionAmount() == 0L) {
+			throw new MalformedMessageException("Malformed message payload. Transaction Amount must not be zero (0).");
 		}
 	}
 	private void validateMessage(TraceableMessage<?> data) throws NonTransientDataAccessResourceException {

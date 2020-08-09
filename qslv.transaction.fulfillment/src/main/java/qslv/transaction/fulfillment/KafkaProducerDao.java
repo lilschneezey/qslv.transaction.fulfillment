@@ -15,8 +15,8 @@ import qslv.transaction.request.TransactionRequest;
 import qslv.transaction.response.TransactionResponse;
 
 @Repository
-public class KafkaDao {
-	private static final Logger log = LoggerFactory.getLogger(KafkaDao.class);
+public class KafkaProducerDao {
+	private static final Logger log = LoggerFactory.getLogger(KafkaProducerDao.class);
 
 	@Autowired
 	private ConfigProperties config;
@@ -35,7 +35,7 @@ public class KafkaDao {
 	public void produceResponse(TraceableMessage<ResponseMessage<TransactionRequest,TransactionResponse>> message) throws DataAccessException {
 		log.trace("ENTRY produceResponse");
 		try {
-			String key = message.getPayload().getRequest().getAccountNumber();
+			String key =  message.getPayload().getRequest() == null ? "NULL_PAYLOAD_KEY_SUBSTITUTE" : message.getPayload().getRequest().getAccountNumber();
 			transactionKafkaTemplate.send(config.getKafkaTransactionReplyQueue(), key, message).get();
 			log.debug("Kakfa Produce {}", message);
 		} catch ( ExecutionException ex ) {

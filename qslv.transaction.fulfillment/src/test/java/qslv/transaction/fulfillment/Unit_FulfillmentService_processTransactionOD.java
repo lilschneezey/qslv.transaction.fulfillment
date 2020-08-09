@@ -26,7 +26,7 @@ import qslv.transaction.resource.TransactionResource;
 import qslv.transaction.response.CommitReservationResponse;
 import qslv.transaction.response.ReservationResponse;
 import qslv.transaction.response.TransactionResponse;
-import qslv.transaction.response.TransferAndTransactReponse;
+import qslv.transaction.response.TransferAndTransactResponse;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -53,7 +53,7 @@ class Unit_FulfillmentService_processTransactionOD {
 		TransactionResponse response = setup_response();
 		List<OverdraftInstruction> instructions = setup_instructions();
 		ReservationResponse reservation = setup_OverDraftReservation();
-		TransferAndTransactReponse tResponse = setupTransferAndTransactResponse();
+		TransferAndTransactResponse tResponse = setupTransferAndTransactResponse();
 		CommitReservationResponse commitResponse = setupCommitResponse();
 		
 		//--Prepare----------------------
@@ -139,7 +139,7 @@ class Unit_FulfillmentService_processTransactionOD {
 		TransactionResponse response = setup_response();
 		List<OverdraftInstruction> instructions = setup_instructions();
 		ReservationResponse reservation = setup_OverDraftReservation();
-		TransferAndTransactReponse tResponse = setupTransferAndTransactResponse();
+		TransferAndTransactResponse tResponse = setupTransferAndTransactResponse();
 		
 		//--Prepare----------------------
 		doReturn(response).when(transactionDao).recordTransaction(any(), any());
@@ -297,9 +297,9 @@ class Unit_FulfillmentService_processTransactionOD {
 		return response;
 	}
 
-	private TransferAndTransactReponse setupTransferAndTransactResponse() {
-		TransferAndTransactReponse response = new TransferAndTransactReponse();
-		response.setStatus(TransferAndTransactReponse.SUCCESS);
+	private TransferAndTransactResponse setupTransferAndTransactResponse() {
+		TransferAndTransactResponse response = new TransferAndTransactResponse();
+		response.setStatus(TransferAndTransactResponse.SUCCESS);
 		
 		ArrayList<TransactionResource> list = new ArrayList<>();
 		response.setTransactions(list);

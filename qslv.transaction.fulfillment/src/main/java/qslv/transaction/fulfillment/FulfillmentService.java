@@ -17,7 +17,7 @@ import qslv.transaction.resource.TransactionResource;
 import qslv.transaction.response.CommitReservationResponse;
 import qslv.transaction.response.ReservationResponse;
 import qslv.transaction.response.TransactionResponse;
-import qslv.transaction.response.TransferAndTransactReponse;
+import qslv.transaction.response.TransferAndTransactResponse;
 
 @Service
 public class FulfillmentService {
@@ -48,18 +48,20 @@ public class FulfillmentService {
 
 			//-------Step 1 - create a Reservation in an Overdraft Account
 			List<TransactionResource> reservations = processOverdraftInstructions(tracedata, request);
+			TransactionResource lastReservation = reservations.get(reservations.size()-1);
 
 			accumulatedTransactions.addAll(reservations);
 			
-			if ( reservations.size() > 0 && TransactionResource.RESERVATION 
-					== reservations.get(reservations.size()-1).getTransactionTypeCode()) {
-				TransactionResource reservation = reservations.get(reservations.size()-1);
+			if ( reservations.size() > 0 && lastReservation.getTransactionTypeCode().equals(TransactionResource.RESERVATION)) {
 				
 				//-------Step 2 - Multi-step Database Transaction: 1) transfer funds into account, 2) post the transaction
 				TransferAndTransactRequest tRequest = new TransferAndTransactRequest();
-				tRequest.setTransferReservation(reservation);
+				tRequest.setTransferReservation(lastReservation);
 				tRequest.setTransactionRequest(request);
-				TransferAndTransactReponse tResponse = transactionDao.transferAndTransact(tracedata, tRequest);
+				tRequest.setRequestUuid(lastReservation.getTransactionUuid());
+				TransferAndTransactResponse tResponse = transactionDao.transferAndTransact(tracedata, tRequest);
+	
+				log.debug("Transfer and Transact complete.");
 				
 				accumulatedTransactions.addAll(tResponse.getTransactions());
 
@@ -69,14 +71,15 @@ public class FulfillmentService {
 				// 2) Its safe because: Transaction ID's are generated internally, not by clients.
 				// --------------------------------------------------------------------
 				CommitReservationRequest commitRequest = new CommitReservationRequest();
-				commitRequest.setRequestUuid(reservation.getTransactionUuid());
-				commitRequest.setReservationUuid(reservation.getTransactionUuid());
-				commitRequest.setTransactionAmount(reservation.getTransactionAmount());
-				commitRequest.setTransactionMetaDataJson(reservation.getTransactionMetaDataJson());
+				commitRequest.setRequestUuid(lastReservation.getTransactionUuid());
+				commitRequest.setReservationUuid(lastReservation.getTransactionUuid());
+				commitRequest.setTransactionAmount(lastReservation.getTransactionAmount());
+				commitRequest.setTransactionMetaDataJson(lastReservation.getTransactionMetaDataJson());
 				
 				//---------Step 3 - Commit the Reservation in the Overdraft Account
 				CommitReservationResponse commitResponse = transactionDao.commitReservation(tracedata, commitRequest);
 				accumulatedTransactions.add(commitResponse.getResource());
+				log.debug("Commit complete.");
 				
 				response.setStatus(TransactionResponse.SUCCESS);
 			} else {
@@ -109,8 +112,9 @@ public class FulfillmentService {
 				responses.add(reservationResponse.getResource());
 
 				if ( reservationResponse.getStatus() == ReservationResponse.INSUFFICIENT_FUNDS ) {
-					log.debug("Overdraft Instruction failed. {}", instruction.toString());
+					log.debug("Overdraft Instruction failed. {}", instruction);
 				} else {
+					log.debug("Overdraft reservation made {}", instruction);
 					break;
 				}
 			}			
@@ -120,14 +124,14 @@ public class FulfillmentService {
 		return responses;
 	}
 	private boolean instructionEffective(OverdraftInstruction instruction) {
-		return ( instruction.getInstructionLifecycleStatus() == "EF" &&
+		return ( instruction.getInstructionLifecycleStatus().equals("EF") &&
 				 java.time.LocalDateTime.now().compareTo(instruction.getEffectiveStart()) > 0 &&
 				 ( instruction.getEffectiveEnd() == null ||
 				 java.time.LocalDateTime.now().compareTo(instruction.getEffectiveEnd()) < 0) );
 	}
 
 	private boolean accountInGoodStanding(Account account) {
-		return (account.getAccountLifeCycleStatus() == "EF");
+		return (account.getAccountLifeCycleStatus().equals("EF"));
 	}
 
 }

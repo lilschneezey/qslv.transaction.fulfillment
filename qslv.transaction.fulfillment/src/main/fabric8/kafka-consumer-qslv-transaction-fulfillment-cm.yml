@@ -1,13 +1,13 @@
   kind: "ConfigMap"
   apiVersion: "v1"
   metadata:
-    name: kafka-consumer-qslv-transaction-fulfillment
+    name: kafka-consumer-${project.artifactId}
   data:
     kafka.properties: |
-      bootstrap.servers=qslv-kafka.qslv-transaction-rest.svc:9092
+      bootstrap.servers=kafka-broker.quick-silver.svc:9092
       retries=3
       max.in.flight.requests.per.connection=1
       request.timeout.ms=15000
       retry.backoff.ms=1000
-      group.id=qslv.fullfillment.client
-      schema.registry.url=http://qslv-schema-registry.qslv-transaction-rest.svc:8081
+      group.id=qslv.transaction.fulfillment.client
+      schema.registry.url=http://schema-registry.quick-silver.svc:8081

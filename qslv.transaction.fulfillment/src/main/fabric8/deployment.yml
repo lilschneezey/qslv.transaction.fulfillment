@@ -14,6 +14,8 @@ spec:
               mountPath: "/deployments/config/kafka-producer"
               readOnly: true
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: openshift
             - name: SPRING_DATASOURCE_USER
               valueFrom:
                 secretKeyRef:

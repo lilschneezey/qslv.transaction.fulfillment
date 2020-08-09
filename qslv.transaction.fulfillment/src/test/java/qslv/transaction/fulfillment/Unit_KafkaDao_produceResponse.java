@@ -27,7 +27,7 @@ import qslv.transaction.response.TransactionResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class Unit_KafkaDao_produceResponse {
-	KafkaDao kafkaDao = new KafkaDao();
+	KafkaProducerDao kafkaDao = new KafkaProducerDao();
 	ConfigProperties config = new ConfigProperties();
 	
 	@Mock

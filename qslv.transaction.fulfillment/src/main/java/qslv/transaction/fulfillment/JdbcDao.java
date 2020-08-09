@@ -29,7 +29,8 @@ public class JdbcDao {
 			"SELECT o.overdraft_account_no, oda.lifecycle_status_cd as od_lifecycle_status, o.lifecycle_status_cd, o.effective_start_dt, o.effective_end_dt"
 			+ " FROM overdraft_instruction o, account oda"
 			+ " WHERE o.account_no = ?"
-			+ " AND o.overdraft_account_no = oda.account_no;";
+			+ " AND o.overdraft_account_no = oda.account_no "
+			+ " ORDER BY o.sequence asc";
 	
 	public List<OverdraftInstruction> getOverdraftInstructions(final String accountNumber) {
 		log.warn("getOverdraftInstructions ENTRY {}", accountNumber);

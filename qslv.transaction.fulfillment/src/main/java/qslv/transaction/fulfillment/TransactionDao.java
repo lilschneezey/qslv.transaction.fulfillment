@@ -28,7 +28,7 @@ import qslv.transaction.request.TransferAndTransactRequest;
 import qslv.transaction.response.CommitReservationResponse;
 import qslv.transaction.response.ReservationResponse;
 import qslv.transaction.response.TransactionResponse;
-import qslv.transaction.response.TransferAndTransactReponse;
+import qslv.transaction.response.TransferAndTransactResponse;
 
 @Repository
 public class TransactionDao {
@@ -39,8 +39,8 @@ public class TransactionDao {
 			new ParameterizedTypeReference<TimedResponse<TransactionResponse>>() {};
 	private static ParameterizedTypeReference<TimedResponse<ReservationResponse>> reservationResponseType =
 			new ParameterizedTypeReference<TimedResponse<ReservationResponse>>() {};
-	private static ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>> transferAndTransactResponseType =
-					new ParameterizedTypeReference<TimedResponse<TransferAndTransactReponse>>() {};
+	private static ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>> transferAndTransactResponseType =
+					new ParameterizedTypeReference<TimedResponse<TransferAndTransactResponse>>() {};
 
 	@Autowired
 	private ConfigProperties config;
@@ -63,7 +63,9 @@ public class TransactionDao {
 	public TransactionResponse recordTransaction(final TraceableMessage<?> message, final TransactionRequest request) {
 		log.warn("recordTransaction ENTRY");
 
-		TransactionResponse response = callService(message, config.getPostTransactionUrl(), request, transactionResponseType);
+		HttpHeaders headers = buildHeaders(message);
+		headers.add(TraceableRequest.ACCEPT_VERSION, CommitReservationRequest.VERSION_1_0);
+		TransactionResponse response = callService(message, headers, config.getPostTransactionUrl(), request, transactionResponseType);
 
 		log.warn("recordTransaction EXIT");
 		return response;
@@ -72,16 +74,20 @@ public class TransactionDao {
 	public ReservationResponse recordReservation(final TraceableMessage<?> message, final ReservationRequest request) {
 		log.warn("recordReservation ENTRY");
 
-		ReservationResponse response = callService(message, config.getPostReservationUrl(), request, reservationResponseType);
+		HttpHeaders headers = buildHeaders(message);
+		headers.add(TraceableRequest.ACCEPT_VERSION, CommitReservationRequest.VERSION_1_0);
+		ReservationResponse response = callService(message, headers, config.getPostReservationUrl(), request, reservationResponseType);
 
 		log.warn("recordReservation EXIT");
 		return response;
 	}
 	
-	public TransferAndTransactReponse transferAndTransact(final TraceableMessage<?> message, final TransferAndTransactRequest request) {
+	public TransferAndTransactResponse transferAndTransact(final TraceableMessage<?> message, final TransferAndTransactRequest request) {
 		log.warn("transferAndTransact ENTRY");
 
-		TransferAndTransactReponse response = callService(message, config.getTransferAndTransactUrl(), request, transferAndTransactResponseType);
+		HttpHeaders headers = buildHeaders(message);
+		headers.add(TraceableRequest.ACCEPT_VERSION, CommitReservationRequest.VERSION_1_0);
+		TransferAndTransactResponse response = callService(message, headers, config.getTransferAndTransactUrl(), request, transferAndTransactResponseType);
 
 		log.warn("transferAndTransact EXIT");
 		return response;
@@ -90,16 +96,18 @@ public class TransactionDao {
 	public CommitReservationResponse commitReservation(final TraceableMessage<?> message, final CommitReservationRequest request) {
 		log.warn("commitReservation ENTRY");
 
-		CommitReservationResponse response = callService(message, config.getCommitReservationUrl(), request, commitResponseType);
+		HttpHeaders headers = buildHeaders(message);
+		headers.add(TraceableRequest.ACCEPT_VERSION, CommitReservationRequest.VERSION_1_0);
+		CommitReservationResponse response = callService(message, headers, config.getCommitReservationUrl(), request, commitResponseType);
 
 		log.warn("commitReservation EXIT");
 		return response;
 	}
 	
-	private <M,R> R callService(final TraceableMessage<?> message, String url, M request, ParameterizedTypeReference<TimedResponse<R>> typereference) {
+	private <M,R> R callService(final TraceableMessage<?> message, HttpHeaders headers,
+			String url, M request, ParameterizedTypeReference<TimedResponse<R>> typereference) {
 		log.trace("commitReservation ENTRY");
 
-		HttpHeaders headers = buildHeaders(message);
 		ResponseEntity<TimedResponse<R>> response = null;
 		try {
 			response = retryTemplate.execute(new RetryCallback<ResponseEntity<TimedResponse<R>>, ResourceAccessException>() {

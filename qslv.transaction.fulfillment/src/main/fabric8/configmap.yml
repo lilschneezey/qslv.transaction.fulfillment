@@ -4,23 +4,20 @@ data:
   application.properties: |
     logging.level.qslv=DEBUG
     qslv.aitid=12345
-    spring.datasource.url=jdbc:postgresql://local-cockroach-db.qslv-transaction-rest.svc:26257/deposits?sslmode=disable
+    spring.datasource.url=jdbc:postgresql://cockroach.quick-silver.svc:26257/deposits?sslmode=disable
     spring.datasource.username=root
-    qslv.commit-reservation-url=http://qslv-transaction-rest:8080/CommitReservation
-    qslv.post-reservation-url=http://qslv-transaction-rest:8080/Reservation
-    qslv.post-transaction-url=reservation-url=http://qslv-transaction-rest:8080/Transaction
-    qslv.transfer-and-transact-url=http://qslv-transaction-rest:8080/TransferAndTransact
+    qslv.commit-reservation-url=http://qslv-transaction-rest-quick-silver.192.168.64.3.nip.io/CommitReservation
+    qslv.post-reservation-url=http://qslv-transaction-rest-quick-silver.192.168.64.3.nip.io/Reservation
+    qslv.post-transaction-url=http://qslv-transaction-rest-quick-silver.192.168.64.3.nip.io/Transaction
+    qslv.transfer-and-transact-url=http://qslv-transaction-rest-quick-silver.192.168.64.3.nip.io/TransferAndTransact
     qslv.rest-connect-timeout=500
     qslv.rest-connection-request-timeout=500
     qslv.rest-attempts=3
     qslv.rest-backoff-delay=100
     qslv.rest-backoff-delay-max=500
     qslv.rest-timeout=500
-    qslv.kafka-transaction-request-queue=batch.transaction.requests
-    qslv.kafka-transaction-reply-queue=batch.transaction.replies
+    qslv.kafka-transaction-request-queue=transaction.fulfillment.request.queue
+    qslv.kafka-transaction-reply-queue=transaction.fulfillment.reply.queue
     qslv.kafka-consumer-properties-path=/deployments/config/kafka-consumer/kafka.properties
     qslv.kafka-producer-properties-path=/deployments/config/kafka-producer/kafka.properties
     qslv.kafka-timeout=1000
-    management.endpoint.health.show-details=always
-    management.endpoint.health.show-components=always
-    
