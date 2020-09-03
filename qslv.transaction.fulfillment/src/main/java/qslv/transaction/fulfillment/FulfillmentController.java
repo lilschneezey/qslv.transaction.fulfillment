@@ -63,7 +63,7 @@ public class FulfillmentController {
 		} catch (Exception ex) {
 			log.error("Unrecoverable exception thrown. {}", ex.getLocalizedMessage());
 
-			traceableResponse.getPayload().setMessage(ex.getLocalizedMessage());
+			traceableResponse.getPayload().setErrorMessage(ex.getLocalizedMessage());
 			traceableResponse.getPayload().setStatus(ResponseMessage.INTERNAL_ERROR);
 			if ( ex instanceof MalformedMessageException ) {
 				traceableResponse.getPayload().setStatus(ResponseMessage.MALFORMED_MESSAGE);

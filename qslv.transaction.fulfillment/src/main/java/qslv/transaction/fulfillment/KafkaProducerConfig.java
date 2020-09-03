@@ -24,7 +24,6 @@ import qslv.transaction.request.TransactionRequest;
 import qslv.transaction.response.TransactionResponse;
 
 @Configuration
-@Profile("!test")
 public class KafkaProducerConfig {
 	private static final Logger log = LoggerFactory.getLogger(KafkaProducerConfig.class);
 	
@@ -32,6 +31,7 @@ public class KafkaProducerConfig {
 	ConfigProperties config;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Profile("!test")
 	@Bean
 	public Map<String,Object> producerConfig() throws Exception {
 		Properties kafkaconfig = new Properties();

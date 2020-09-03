@@ -26,11 +26,11 @@ public class RestTemplateProxy  {
 		this.restTemplate = restTemplate;
 	}
 
-	@RemoteServiceSLI(value="POST /Transaction", ait="55555", remoteAit="11111", remoteFailures= {ResourceAccessException.class})
+	@RemoteServiceSLI(value="POST /Transaction", ait="#{@configProperties.aitid}", remoteAit="#{@configProperties.aitid}", remoteFailures= {ResourceAccessException.class})
 	public <T> ResponseEntity<T> exchange(String url, HttpMethod method, @Nullable HttpEntity<?> requestEntity, ParameterizedTypeReference<T> responseType, Object... uriVariables) throws RestClientException {
 		return restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);
 	}
-	@RemoteServiceSLI(value="POST /Transaction", ait="66666", remoteAit="22222", remoteFailures= {ResourceAccessException.class})
+	@RemoteServiceSLI(value="POST /Transaction", ait="#{@configProperties.aitid}", remoteAit="#{@configProperties.aitid}", remoteFailures= {ResourceAccessException.class})
 	public <T> ResponseEntity<T> exchange(String url, HttpMethod method, @Nullable HttpEntity<?> requestEntity, Class<T> responseType, Object... uriVariables) throws RestClientException {
 		return restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);
 	}

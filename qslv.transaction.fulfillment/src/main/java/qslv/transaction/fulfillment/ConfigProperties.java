@@ -10,7 +10,7 @@ import qslv.util.EnableQuickSilver;
 @EnableQuickSilver
 public class ConfigProperties {
 
-	private String aitid = "27834";
+	private String aitid;
 	private String commitReservationUrl;
 	private String postReservationUrl;
 	private String postTransactionUrl;

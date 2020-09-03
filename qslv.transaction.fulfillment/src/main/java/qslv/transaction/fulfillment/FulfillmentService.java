@@ -39,51 +39,53 @@ public class FulfillmentService {
 		log.trace("FulfillmentService.processTransaction ENTRY");
 		TransactionResponse response = transactionDao.recordTransaction(tracedata, request);
 		
-		if ( response.getStatus() == TransactionResponse.INSUFFICIENT_FUNDS  && request.isProtectAgainstOverdraft() ) {
-			
-			//-------Step 0 - switch Transaction List over to a mutable ArrayList
-			ArrayList<TransactionResource> accumulatedTransactions = new ArrayList<>();
-			accumulatedTransactions.addAll(response.getTransactions());
-			response.setTransactions(accumulatedTransactions);
+		if (response.getStatus() == TransactionResponse.INSUFFICIENT_FUNDS && request.isProtectAgainstOverdraft()) {
 
-			//-------Step 1 - create a Reservation in an Overdraft Account
+			// -------Step 0 - attempt to locate a Reservation in an Overdraft Account
 			List<TransactionResource> reservations = processOverdraftInstructions(tracedata, request);
-			TransactionResource lastReservation = reservations.get(reservations.size()-1);
+			if (reservations.size() > 0) {
 
-			accumulatedTransactions.addAll(reservations);
-			
-			if ( reservations.size() > 0 && lastReservation.getTransactionTypeCode().equals(TransactionResource.RESERVATION)) {
-				
-				//-------Step 2 - Multi-step Database Transaction: 1) transfer funds into account, 2) post the transaction
-				TransferAndTransactRequest tRequest = new TransferAndTransactRequest();
-				tRequest.setTransferReservation(lastReservation);
-				tRequest.setTransactionRequest(request);
-				tRequest.setRequestUuid(lastReservation.getTransactionUuid());
-				TransferAndTransactResponse tResponse = transactionDao.transferAndTransact(tracedata, tRequest);
-	
-				log.debug("Transfer and Transact complete.");
-				
-				accumulatedTransactions.addAll(tResponse.getTransactions());
+				// -------Step 0 - switch Transaction List over to a mutable ArrayList
+				ArrayList<TransactionResource> accumulatedTransactions = new ArrayList<>();
+				accumulatedTransactions.addAll(response.getTransactions());
+				accumulatedTransactions.addAll(reservations);
+				response.setTransactions(accumulatedTransactions);
 
-				// --------------------------------------------------------------------
-				// We use the Reservation's Transaction UUID as the Request UUID because:
-				// 1) it provides a consistent UUID for idempotency
-				// 2) Its safe because: Transaction ID's are generated internally, not by clients.
-				// --------------------------------------------------------------------
-				CommitReservationRequest commitRequest = new CommitReservationRequest();
-				commitRequest.setRequestUuid(lastReservation.getTransactionUuid());
-				commitRequest.setReservationUuid(lastReservation.getTransactionUuid());
-				commitRequest.setTransactionAmount(lastReservation.getTransactionAmount());
-				commitRequest.setTransactionMetaDataJson(lastReservation.getTransactionMetaDataJson());
-				
-				//---------Step 3 - Commit the Reservation in the Overdraft Account
-				CommitReservationResponse commitResponse = transactionDao.commitReservation(tracedata, commitRequest);
-				accumulatedTransactions.add(commitResponse.getResource());
-				log.debug("Commit complete.");
-				
-				response.setStatus(TransactionResponse.SUCCESS);
-			} else {
-				response.setStatus(TransactionResponse.INSUFFICIENT_FUNDS);
+				TransactionResource lastReservation = reservations.get(reservations.size() - 1);
+				if (lastReservation.getTransactionTypeCode().equals(TransactionResource.RESERVATION)) {
+
+					// -------Step 2 - Multi-step Database Transaction: 1) transfer funds into
+					// account, 2) post the transaction
+					TransferAndTransactRequest tRequest = new TransferAndTransactRequest();
+					tRequest.setTransferReservation(lastReservation);
+					tRequest.setTransactionRequest(request);
+					tRequest.setRequestUuid(lastReservation.getTransactionUuid());
+					TransferAndTransactResponse tResponse = transactionDao.transferAndTransact(tracedata, tRequest);
+
+					log.debug("Transfer and Transact complete.");
+
+					accumulatedTransactions.addAll(tResponse.getTransactions());
+
+					// --------------------------------------------------------------------
+					// We use the Reservation's Transaction UUID as the Request UUID because:
+					// 1) it provides a consistent UUID for idempotency
+					// 2) Its safe because: Transaction ID's are generated internally, not by
+					// clients.
+					// --------------------------------------------------------------------
+					CommitReservationRequest commitRequest = new CommitReservationRequest();
+					commitRequest.setRequestUuid(lastReservation.getTransactionUuid());
+					commitRequest.setReservationUuid(lastReservation.getTransactionUuid());
+					commitRequest.setTransactionAmount(lastReservation.getTransactionAmount());
+					commitRequest.setTransactionMetaDataJson(lastReservation.getTransactionMetaDataJson());
+
+					// ---------Step 3 - Commit the Reservation in the Overdraft Account
+					CommitReservationResponse commitResponse = transactionDao.commitReservation(tracedata,
+							commitRequest);
+					accumulatedTransactions.add(commitResponse.getResource());
+					log.debug("Commit complete.");
+
+					response.setStatus(TransactionResponse.SUCCESS);
+				}
 			}
 		}
 		log.trace("FulfillmentService.processTransaction EXIT");

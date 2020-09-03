@@ -126,7 +126,7 @@ public class Unit_EmbeddedKakfa {
 		
 		ResponseMessage<?,?> responseMessage = record.value().getPayload();
 		assertEquals(ResponseMessage.SUCCESS, responseMessage.getStatus());
-		assertNull(responseMessage.getMessage());
+		assertNull(responseMessage.getErrorMessage());
 
 		TransactionRequest tranRequest = record.value().getPayload().getRequest();
 		assertEquals(tranRequest.getAccountNumber(), message.getPayload().getAccountNumber());
